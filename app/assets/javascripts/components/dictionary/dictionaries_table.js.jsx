@@ -19,6 +19,9 @@ var DictionaryTable = React.createClass({
     );
   },
   render: function() {
+    var noDictionary = (
+      <div className="alert alert-warning">No dictionary</div>
+    )
     return(
       <div className='row'>
         <div className='table-responsive'>
@@ -36,6 +39,7 @@ var DictionaryTable = React.createClass({
               {this.renderDictionaryRows()}
             </tbody>
           </table>
+          {this.props.dictionaries.length == 0 ? noDictionary : null}
         </div>
       </div>
     );

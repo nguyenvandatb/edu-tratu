@@ -36,7 +36,7 @@ var WordsContainer = React.createClass({
   parentUpdateWord: function(formData, onSuccess, onError){
     formData['dictionary_id'] = this.state.dictionary_id;
     $.ajax({
-      url: ('/words/' + formData['word']['id']),
+      url: '/words/' + formData['word']['id'],
       dataType: 'json',
       type: 'PATCH',
       data: formData,
@@ -60,7 +60,7 @@ var WordsContainer = React.createClass({
       confirmButtonColor: "#ec6c62"
     },function () {
       $.ajax({
-        url: ('/words/' + formData['id']),
+        url: '/words/' + formData['id'],
         dataType: 'json',
         type: 'DELETE',
         data: {dictionary_id: this.state.dictionary_id},
@@ -79,6 +79,20 @@ var WordsContainer = React.createClass({
       filterText: filterText
     });
   },
+  handleDictionaryChange(dictionary_id) {
+    $.ajax({
+      url: '/words/',
+      dataType: 'json',
+      type: 'GET',
+      data: {dictionary_id: this.state.dictionary_id},
+      success: function(words) {
+        this.setState({words: words});
+      }.bind(this),
+      error: function(response, status, err) {
+        swal("Oops", "We couldn't get words for this dictionary", "error");
+      }
+    });
+  },
   render: function() {
     return(
       <div>
@@ -88,6 +102,13 @@ var WordsContainer = React.createClass({
             <SearchBar
               filterText={this.state.filterText}
               onFilterTextInput={this.handleFilterTextInput}
+            />
+          </div>
+          <div className='col-md-2'>
+            <DictionaryFilter
+              dictionary_id={this.props.dictionary_id}
+              onDictionaryChange={this.handleDictionaryChange}
+              dictionaries={this.state.dictionaries}
             />
           </div>
         </div>

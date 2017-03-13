@@ -1,11 +1,12 @@
 class WordsController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_dictionary, only: [:index, :create, :update, :destroy]
+  before_action :load_dictionary, only: [:create, :update, :destroy]
   before_action :load_word, only: [:update, :destroy]
 
   def index
-    @dictionary_id = @dictionary.id
-    @words = @dictionary.words
+    dictionary = current_user.dictionaries.first
+    @dictionary_id = dictionary.id
+    @words = dictionary.words
     @dictionaries = current_user.dictionaries
   end
 
