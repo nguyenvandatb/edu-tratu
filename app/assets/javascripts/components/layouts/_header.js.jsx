@@ -6,7 +6,7 @@ var Header = React.createClass({
       showModal: false,
       user: null,
       is_root_page: this.props.current_page,
-      showOrganizationModal: false
+      showOrganizationModal: false,
     }
   },
   componentWillMount: function(){

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170309011021) do
+ActiveRecord::Schema.define(version: 20170322132409) do
 
   create_table "activities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "action_id"
@@ -73,6 +73,18 @@ ActiveRecord::Schema.define(version: 20170309011021) do
     t.datetime "updated_at",                null: false
   end
 
+  create_table "request_org_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "sender_status",   default: 0
+    t.integer  "receiver_status", default: 2
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.integer  "sender_id"
+    t.index ["organization_id"], name: "index_request_org_users_on_organization_id", using: :btree
+    t.index ["user_id"], name: "index_request_org_users_on_user_id", using: :btree
+  end
+
   create_table "reviews", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.float    "rating",        limit: 24
     t.integer  "dictionary_id"
@@ -99,8 +111,6 @@ ActiveRecord::Schema.define(version: 20170309011021) do
     t.string   "address"
     t.string   "image"
     t.string   "phone"
-    t.string   "uid"
-    t.string   "provider"
     t.integer  "role",                   default: 1
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
@@ -143,6 +153,8 @@ ActiveRecord::Schema.define(version: 20170309011021) do
   add_foreign_key "dictionaries", "users"
   add_foreign_key "organization_members", "organizations"
   add_foreign_key "organization_members", "users"
+  add_foreign_key "request_org_users", "organizations"
+  add_foreign_key "request_org_users", "users"
   add_foreign_key "reviews", "dictionaries"
   add_foreign_key "reviews", "users"
   add_foreign_key "shared_dictionaries", "dictionaries"

@@ -12,6 +12,12 @@ var UserDetail = React.createClass({
   handleOrganizationChange: function(e) {
     this.setState({organization_id: e.target.value});
   },
+  handleSendRequest: function(e) {
+    e.preventDefault();
+    requestData = {request: {organization_id: this.state.organization_id,
+          user_id: this.props.id}, q: this.props.filterText}
+    this.props.handleSendRequest(requestData);
+  },
   render: function() {
     let orgField = [
       <div className='row'>
@@ -25,7 +31,9 @@ var UserDetail = React.createClass({
       </div>,
       <div className='row'>
         <div className='col-sm-2'>
-          <button type='button' className='btn btn-primary'>Send</button>
+          <a href='#' className='btn btn-primary' onClick={this.handleSendRequest}>
+            Send
+          </a>
         </div>
       </div>]
     return (

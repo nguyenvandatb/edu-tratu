@@ -16,5 +16,6 @@ Rails.application.routes.draw do
     get "/words", to: "words#index"
     get "/users", to: "users#index"
     get "/organizations", to: "organizations#index"
+    resources :invite_org_users
   end
 end

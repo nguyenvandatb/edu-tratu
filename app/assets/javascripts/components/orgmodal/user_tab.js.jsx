@@ -35,6 +35,32 @@ var UserTab = React.createClass({
       }
     });
   },
+  handleSendRequest: function(requestData) {
+    swal({
+      title: "Are you sure?",
+      text: "Are you sure that you want to invite this user?",
+      type: "warning",
+      showCancelButton: true,
+      closeOnConfirm: true,
+      confirmButtonText: "Yes!",
+      confirmButtonColor: "#ec6c62"
+    },function () {
+      $.ajax({
+        url: '/api/invite_org_users',
+        dataType: 'json',
+        type: 'POST',
+        data: requestData,
+        success: function(detail) {
+          this.setState({users: detail.users});
+          this.props.parentHandleSendRequest(detail.requests);
+          swal("Send!", "Your request is sent!", "success");
+        }.bind(this),
+        error: function(response, status, err) {
+          swal("Oops", "We couldn't send this request!", "error");
+        }
+      });
+    }.bind(this));
+  },
   renderSearchBar: function() {
     return (
       <form>
@@ -50,7 +76,7 @@ var UserTab = React.createClass({
   },
   renderUsers: function() {
     return (
-      this.state.users.map(function(user, index){
+      this.state.users.map(function(user){
         return(
           <UserDetail
             key={user.id}
@@ -58,6 +84,8 @@ var UserTab = React.createClass({
             name={user.name}
             email={user.email}
             organizations={this.state.organizations}
+            handleSendRequest={this.handleSendRequest}
+            filterText={this.state.filterText}
           />
         );
       }.bind(this))
