@@ -16,5 +16,8 @@ Rails.application.routes.draw do
     get "/words", to: "words#index"
     get "/users", to: "users#index"
     get "/organizations", to: "organizations#index"
+    resources :invitations, only: [:index, :create, :destroy]
+    resources :requests, only: [:index, :create, :destroy]
   end
+  mount ActionCable.server, at: '/cable'
 end

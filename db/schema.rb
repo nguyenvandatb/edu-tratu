@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170309011021) do
+ActiveRecord::Schema.define(version: 20170323033835) do
 
   create_table "activities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "action_id"
@@ -54,13 +54,26 @@ ActiveRecord::Schema.define(version: 20170309011021) do
     t.index ["user_id"], name: "index_dictionaries_on_user_id", using: :btree
   end
 
+  create_table "invitations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.integer  "sender_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["organization_id"], name: "index_invitations_on_organization_id", using: :btree
+    t.index ["user_id", "organization_id", "sender_id"], name: "index_invitations_on_user_id_and_organization_id_and_sender_id", unique: true, using: :btree
+    t.index ["user_id"], name: "index_invitations_on_user_id", using: :btree
+  end
+
   create_table "organization_members", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "role",            default: 0
     t.integer  "status"
     t.integer  "user_id"
     t.integer  "organization_id"
+    t.datetime "deleted_at"
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+    t.index ["deleted_at"], name: "index_organization_members_on_deleted_at", using: :btree
     t.index ["organization_id"], name: "index_organization_members_on_organization_id", using: :btree
     t.index ["user_id"], name: "index_organization_members_on_user_id", using: :btree
   end
@@ -71,6 +84,16 @@ ActiveRecord::Schema.define(version: 20170309011021) do
     t.string   "image"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+  end
+
+  create_table "requests", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["organization_id"], name: "index_requests_on_organization_id", using: :btree
+    t.index ["user_id", "organization_id"], name: "index_requests_on_user_id_and_organization_id", unique: true, using: :btree
+    t.index ["user_id"], name: "index_requests_on_user_id", using: :btree
   end
 
   create_table "reviews", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -141,8 +164,12 @@ ActiveRecord::Schema.define(version: 20170309011021) do
   add_foreign_key "categories", "users"
   add_foreign_key "dictionaries", "categories"
   add_foreign_key "dictionaries", "users"
+  add_foreign_key "invitations", "organizations"
+  add_foreign_key "invitations", "users"
   add_foreign_key "organization_members", "organizations"
   add_foreign_key "organization_members", "users"
+  add_foreign_key "requests", "organizations"
+  add_foreign_key "requests", "users"
   add_foreign_key "reviews", "dictionaries"
   add_foreign_key "reviews", "users"
   add_foreign_key "shared_dictionaries", "dictionaries"

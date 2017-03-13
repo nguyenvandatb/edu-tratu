@@ -9,10 +9,24 @@ class User < ApplicationRecord
   has_many :bookmarks
   has_many :categories
   has_many :organizations, through: :organization_members
+  has_many :incoming_invitations, class_name: "Invitation", foreign_key: "user_id"
+  has_many :sent_invitations, class_name: "Invitation", foreign_key: "sender_id"
+  has_many :requests
 
   enum role: [:admin, :user]
-  scope :sought, ->(q, user_id) { where "name LIKE ? AND id <> ?",
-    "%#{q}%", "#{user_id}" if q.present? }
+  scope :sought, lambda { |q, user_id|
+    where "name LIKE ? AND id <> ? AND id NOT IN
+      (SELECT user_id FROM invitations WHERE organization_id IN
+        (SELECT organization_id FROM organization_members WHERE user_id = ? AND
+          role = 0) GROUP BY user_id
+            HAVING COUNT(DISTINCT organization_id) =
+              (SELECT COUNT(organization_id) FROM organization_members WHERE user_id = ? AND role = 0))",
+          "%#{q}%", "#{user_id}", "#{user_id}", "#{user_id}"
+  }
+  scope :org_owners, lambda { |organization_id|
+    joins(:organization_members).where("organization_id = ? AND
+      organization_members.role = 0", "#{organization_id}")
+  }
 
   class << self
     def from_omniauth auth

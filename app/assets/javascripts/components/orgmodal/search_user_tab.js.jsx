@@ -1,4 +1,4 @@
-var UserTab = React.createClass({
+var SearchUserTab = React.createClass({
   getInitialState: function() {
     return {
       filterText: '',
@@ -11,7 +11,7 @@ var UserTab = React.createClass({
       url: '/api/organizations',
       dataType: 'json',
       type: 'GET',
-      data: {},
+      data: {type: 'my_org'},
       success: function(organizations) {
         this.setState({organizations: organizations});
       }.bind(this),
@@ -31,9 +31,32 @@ var UserTab = React.createClass({
         this.setState({users: users});
       }.bind(this),
       error: function(response, status, err) {
-        // swal("Oops", "We couldn't get the users you want", "error");
       }
     });
+  },
+  handleSendInvitation: function(invitationsData) {
+    swal({
+      title: "Are you sure?",
+      text: "Are you sure that you want to invite this user?",
+      type: "warning",
+      showCancelButton: true,
+      closeOnConfirm: true,
+      confirmButtonText: "Yes!",
+      confirmButtonColor: "#ec6c62"
+    },function () {
+      $.ajax({
+        url: '/api/invitations',
+        dataType: 'json',
+        type: 'POST',
+        data: invitationsData,
+        success: function(users) {
+          this.setState({users: users});
+        }.bind(this),
+        error: function(response, status, err) {
+          swal("Oops", "We couldn't send this invitation!", "error");
+        }
+      });
+    }.bind(this));
   },
   renderSearchBar: function() {
     return (
@@ -41,8 +64,8 @@ var UserTab = React.createClass({
         <input
           className="form-control"
           type="text"
-          placeholder="Search..."
-          value={this.props.filterText}
+          placeholder="Enter user name"
+          value={this.state.filterText}
           onChange={this.handleFilterTextInputChange}
         />
       </form>
@@ -50,14 +73,16 @@ var UserTab = React.createClass({
   },
   renderUsers: function() {
     return (
-      this.state.users.map(function(user, index){
+      this.state.users.map(function(user){
         return(
-          <UserDetail
+          <SearchUserDetail
             key={user.id}
             id={user.id}
             name={user.name}
             email={user.email}
             organizations={this.state.organizations}
+            handleSendInvitation={this.handleSendInvitation}
+            filterText={this.state.filterText}
           />
         );
       }.bind(this))

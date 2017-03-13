@@ -2,6 +2,7 @@ en:
   title: "Framgia Edu-Tratu"
   danger_not_admin: "You not admin"
   error_denied: "Access denied. You are not authorized to access the requested page."
+  cannot_send_request: "Cannot send request"
   devise:
     sessions:
       new:

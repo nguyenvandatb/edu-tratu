@@ -6,7 +6,11 @@ var Header = React.createClass({
       showModal: false,
       user: null,
       is_root_page: this.props.current_page,
-      showOrganizationModal: false
+      showOrganizationModal: false,
+      sentInvitations: [],
+      incomingInvitations: [],
+      sentRequests: [],
+      incomingRequests: []
     }
   },
   componentWillMount: function(){
@@ -15,15 +19,49 @@ var Header = React.createClass({
       url: '/auth',
       dataType: 'json',
       success: function(data){
-      this.setState({
-        signedIn: data.signed_in,
-        user: data.signed_in ? data.user.name : null
-      })
+        this.setState({
+          signedIn: data.signed_in,
+          user: data.signed_in ? data.user.name : null
+        })
+        if (this.state.signedIn) {
+          console.log("Sign In")
+          $.ajax({
+            url: '/api/invitations',
+            dataType: 'json',
+            type: 'GET',
+            data: {},
+            success: function(invitations) {
+              this.setState({sentInvitations: invitations.sent_invitations,
+                             incomingInvitations: invitations.incoming_invitations})
+              console.log(invitations);
+            }.bind(this),
+            error: function(response, status, err) {
+            }
+          });
+          $.ajax({
+            url: '/api/requests',
+            dataType: 'json',
+            type: 'GET',
+            data: {},
+            success: function(requests) {
+              this.setState({sentRequests: requests.sent_requests,
+                             incomingRequests: requests.incoming_requests})
+              console.log(requests);
+            }.bind(this),
+            error: function(response, status, err) {
+            }
+          });
+        } else {
+          console.log("Not Sign In")
+        }
       }.bind(this),
       error: function(xhr, status, err){
         console.error('/auth', status, err.toString());
       }
-    })
+    });
+    this.setSubscription();
+  },
+  componentDidMount: function() {
   },
   handleHideModal: function(){
     this.setState({
@@ -60,6 +98,26 @@ var Header = React.createClass({
     this.setState({
       showOrganizationModal: true
     })
+  },
+  setSubscription: function() {
+    App.message = App.cable.subscriptions.create("JoinChannel", {
+      connected: function() {
+      },
+      disconnected: function() {
+      },
+      received: function(data) {
+        console.log(data);
+        if (data.is_sent_invitation) {
+          this.setState({sentInvitations: data.sent_invitations});
+        } else if (data.is_incoming_invitation) {
+          this.setState({incomingInvitations: data.incoming_invitations});
+        } else if (data.is_sent_request) {
+          this.setState({sentRequests: data.sent_requests});
+        } else if (data.is_incoming_request) {
+          this.setState({incomingRequests: data.incoming_requests});
+        }
+      }.bind(this)
+    });
   },
   render: function(){
     let login = (
@@ -139,7 +197,11 @@ var Header = React.createClass({
         </div>
         {this.state.showModal ? <Login handleHideModal={this.handleHideModal} /> : null}
         {this.state.showOrganizationModal ? <OrgModal
-          handleHideModal={this.handleHideOrganizationModal} /> : null}
+          handleHideModal={this.handleHideOrganizationModal}
+          sentInvitations={this.state.sentInvitations}
+          incomingInvitations={this.state.incomingInvitations}
+          sentRequests={this.state.sentRequests}
+          incomingRequests={this.state.incomingRequests}/> : null}
       </div>
     )
   }

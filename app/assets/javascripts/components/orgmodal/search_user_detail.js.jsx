@@ -1,4 +1,4 @@
-var UserDetail = React.createClass({
+var SearchUserDetail = React.createClass({
   getInitialState: function() {
     return {
       organization_id: this.props.organizations.length &&
@@ -11,6 +11,12 @@ var UserDetail = React.createClass({
   },
   handleOrganizationChange: function(e) {
     this.setState({organization_id: e.target.value});
+  },
+  handleSendInvitation: function(e) {
+    e.preventDefault();
+    invitationData = {invitation: {organization_id: this.state.organization_id,
+          user_id: this.props.id}, q: this.props.filterText}
+    this.props.handleSendInvitation(invitationData);
   },
   render: function() {
     let orgField = [
@@ -25,7 +31,9 @@ var UserDetail = React.createClass({
       </div>,
       <div className='row'>
         <div className='col-sm-2'>
-          <button type='button' className='btn btn-primary'>Send</button>
+          <a href='#' className='btn btn-primary' onClick={this.handleSendInvitation}>
+            Send
+          </a>
         </div>
       </div>]
     return (
