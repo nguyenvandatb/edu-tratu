@@ -1,9 +1,10 @@
 class WordsController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_dictionary, only: [:index, :create, :update, :destroy]
+  before_action :load_dictionary, only: [:create, :update, :destroy, :index]
   before_action :load_word, only: [:update, :destroy]
 
   def index
+    return unless @dictionary
     @dictionary_id = @dictionary.id
     @words = @dictionary.words
     @dictionaries = current_user.dictionaries
@@ -37,7 +38,11 @@ class WordsController < ApplicationController
   private
 
   def load_dictionary
-    @dictionary = Dictionary.friendly.find params[:dictionary_id]
+    if params[:dictionary_id]
+      @dictionary = Dictionary.friendly.find params[:dictionary_id]
+    else
+      @dictionary = current_user.dictionaries.first
+    end
   end
 
   def load_word

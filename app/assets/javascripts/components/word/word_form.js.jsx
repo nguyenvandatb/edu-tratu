@@ -1,7 +1,7 @@
 var NewWordForm = React.createClass({
   getInitialState: function(){
     return {
-      dictionary_id: this.props.dictionaries.length > 0 ? this.props.dictionaries[0].id : null,
+      dictionary_id: this.props.dictionary_id,
       content: '',
       meaning: '',
       added: false,
@@ -17,13 +17,13 @@ var NewWordForm = React.createClass({
   },
   resetState: function() {
     this.setState({
-      dictionary_id: this.props.dictionaries.length > 0 ? this.props.dictionaries[0].id : null,
       content: "",
       meaning: "",
       formErrors: {}
     });
   },
-  onFileSuccess: function() {
+  onFileSuccess: function(words) {
+    this.props.parentOnFileSuccess(words);
     this.resetState();
     this.setState({
       added_from_file: true,
@@ -53,7 +53,6 @@ var NewWordForm = React.createClass({
   newWordSubmit: function(e){
     e.preventDefault();
     if (this.refs.file_input.state.file) {
-      console.log("dlsajfsafd");
       this.refs.file_input.beginUpload()
     } else {
       var formData = {word: {
@@ -93,11 +92,7 @@ var NewWordForm = React.createClass({
     }
   },
   makeDictionarySelection: function(dictionary){
-    if (this.state.dictionary_id == dictionary.id) {
-      return <option value={dictionary.id} selected>{dictionary.name}</option>;
-    } else {
-      return <option value={dictionary.id}>{dictionary.name}</option>;
-    }
+    return <option key={dictionary.id} value={dictionary.id}>{dictionary.name}</option>;
   },
   renderWordAddedSuccess: function(){
     if (this.state.added) {
@@ -141,7 +136,7 @@ var NewWordForm = React.createClass({
   renderDictionaryCategoryFields: function(){
     return (
       <select className="form-control form-group" name="word[dictionary_id]"
-        onChange={this.handleDictionaryChange}>
+        onChange={this.handleDictionaryChange} value={this.state.dictionary_id}>
           {this.props.dictionaries.map(this.makeDictionarySelection)}
       </select>
     );
@@ -195,7 +190,7 @@ var NewWordForm = React.createClass({
                     {this.renderWordContentField()}
                     {this.renderWordMeaningField()}
                     <div className='row'>
-                      <div className='col-sm-8'>
+                      <div className='col-sm-12'>
                         <FileUploadInput
                           ref="file_input"
                           dictionary_id={this.state.dictionary_id}

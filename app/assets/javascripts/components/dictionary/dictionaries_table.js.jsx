@@ -8,6 +8,7 @@ var DictionaryTable = React.createClass({
             id={dictionary.id}
             categories={this.props.categories}
             category_id={dictionary.category.id}
+            word_count={dictionary.word_count}
             category_name ={dictionary.category.name}
             name={dictionary.name}
             description={dictionary.description}
@@ -19,6 +20,9 @@ var DictionaryTable = React.createClass({
     );
   },
   render: function() {
+    var noDictionary = (
+      <div className="alert alert-warning">No dictionary</div>
+    )
     return(
       <div className='row'>
         <div className='table-responsive'>
@@ -29,13 +33,17 @@ var DictionaryTable = React.createClass({
                 <th>Category</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Word Count</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {this.renderDictionaryRows()}
+              {this.props.dictionaries && this.props.dictionaries.length > 0 ?
+                this.renderDictionaryRows() : null}
             </tbody>
           </table>
+          {this.props.dictionaries == null || this.props.dictionaries.length == 0 ?
+            noDictionary : null}
         </div>
       </div>
     );

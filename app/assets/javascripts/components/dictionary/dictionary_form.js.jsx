@@ -4,7 +4,7 @@ var NewDictionaryForm = React.createClass({
       category_id: this.props.categories.length > 0 ? this.props.categories[0].id : null,
       name: '',
       description: '',
-      is_new_category: false,
+      is_new_category: this.props.categories.length > 0 ? false : true,
       success: false,
       category_name: '',
       category_description: '',
@@ -20,7 +20,7 @@ var NewDictionaryForm = React.createClass({
       is_new_category: false, success: true, category_name: '', category_description: '', formErrors: {}});
   },
   handleValidationError: function(formErrorObj){
-    this.setState({formErrors: formErrorObj});
+    this.setState({formErrors: formErrorObj, success: false});
   },
   newDictionarySubmit: function(e){
     e.preventDefault();
@@ -43,7 +43,7 @@ var NewDictionaryForm = React.createClass({
     );
   },
   handleNewCategory: function(e){
-    this.setState({is_new_category: !this.state.is_new_category})
+    this.setState({is_new_category: !this.state.is_new_category, formErrors:{}})
   },
   handleCategoryChange: function(e) {
     this.setState({category_id: e.target.value});
@@ -61,7 +61,6 @@ var NewDictionaryForm = React.createClass({
     this.setState({description: e.target.value});
   },
   renderFieldErrors: function(attribute, isDictionary){
-
     if (this.state.is_new_category && isDictionary) {
       if (this.state.formErrors["dictionaries." + attribute]) {
         return(
@@ -91,22 +90,18 @@ var NewDictionaryForm = React.createClass({
     }
   },
   makeCategorySelection: function(category) {
-    if (this.state.category_id == category.id) {
-      return <option value={category.id} selected>{category.name}</option>;
-    } else {
-      return <option value={category.id}>{category.name}</option>;
-    }
+    return <option value={category.id} key={category.id}>{category.name}</option>;
   },
   renderDictionaryCategoryFields: function(){
-    let category_link = null
-    let category_type = null
     if (this.state.is_new_category) {
-      category_link = <a className='btn btn-sm btn-danger' onClick={this.handleNewCategory}>
-                        Close?
-                      </a>
+      var categoryLink = (
+        <a className='btn btn-sm btn-danger' onClick={this.handleNewCategory}>
+          Close?
+        </a>
+      )
       var formGroupClass = this.state.formErrors["name"] ?
         "form-group has-error" : "form-group";
-      category_type = [<input
+      var categoryType = [<input
                         name="category[name]"
                         type="string"
                         placeholder="Category Name"
@@ -114,28 +109,40 @@ var NewDictionaryForm = React.createClass({
                         onChange={this.handleCategoryNameChange}
                         className="string form-control"
                       />,
-                      this.renderFieldErrors("name", false)]
+      this.renderFieldErrors("name", false)]
     } else {
-      category_link = <a className='btn btn-sm btn-primary' onClick={this.handleNewCategory}>
-                        New Category
-                      </a>
-      category_type = <select className="form-control" name="dictionary[category_id]"
-                        onChange={this.handleCategoryChange}>
-                          {this.props.categories.map(this.makeCategorySelection)}
-                      </select>
+      var categoryLink = (
+        <a className='btn btn-sm btn-primary' onClick={this.handleNewCategory}>
+          New Category
+        </a>
+      )
+      var categoryType = (
+        <select className="form-control" name="dictionary[category_id]"
+          value={this.state.category_id} onChange={this.handleCategoryChange}>
+            {this.props.categories.map(this.makeCategorySelection)}
+        </select>
+      )
       var formGroupClass = "form-group";
     }
-    return(
+    var hasCategory = (
       <div className='row'>
         <div className='col-sm-9'>
           <div className= {formGroupClass}>
-            {category_type}
+            {categoryType}
           </div>
-        </div>
+        </div>,
         <div className='col-sm-2'>
-          {category_link}
+          {categoryLink}
         </div>
       </div>
+    )
+    var noCategory = (
+      <div className= {formGroupClass}>
+        {categoryType}
+      </div>
+    )
+    return(
+      this.props.categories.length > 0 ? hasCategory : noCategory
     );
   },
   renderCategoryDescriptionField: function(){
@@ -167,7 +174,7 @@ var NewDictionaryForm = React.createClass({
       "form-group has-error" : "form-group";
     }
     return(
-      <div className= {formGroupClass}>
+      <div className={formGroupClass}>
         <input
           name="dictionary[name]"
           type="string"
@@ -209,28 +216,29 @@ var NewDictionaryForm = React.createClass({
       </div>
     )
     return(
-        <div className='modal fade'>
-          <div className='modal-dialog' role='document'>
-            <div className='modal-content'>
-              <div className='modal-header'>
-                <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
-                <h3>Add Dictionary</h3>
-              </div>
-              <div className='modal-body'>
-                {this.state.success ? fieldSuccess : null}
-                <form className= 'form_body' onSubmit={this.newDictionarySubmit}>
-                  <div className='form-inputs'/>
-                    {this.renderDictionaryCategoryFields()}
-                    {this.renderCategoryDescriptionField()}
-                    {this.renderDictionaryNameField()}
-                    {this.renderDictionaryDescriptionField()}
-                    <div className='row'>
-                      <div className='col-sm-4'>
-                        <input type="submit" value="Save" className='btn btn-primary' />
-                      </div>
+      <div className='modal fade'>
+        <div className='modal-dialog' role='document'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <button type='button' className='close' data-dismiss='modal'
+                aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+              <h3>Add Dictionary</h3>
+            </div>
+            <div className='modal-body'>
+              {this.state.success ? fieldSuccess : null}
+              <form className='form_body' onSubmit={this.newDictionarySubmit}>
+                <div className='form-inputs'/>
+                  {this.renderDictionaryCategoryFields()}
+                  {this.renderCategoryDescriptionField()}
+                  {this.renderDictionaryNameField()}
+                  {this.renderDictionaryDescriptionField()}
+                  <div className='row'>
+                    <div className='col-sm-4'>
+                      <input type="submit" value="Save" className='btn btn-primary' />
                     </div>
-                </form>
-                </div>
+                  </div>
+              </form>
+            </div>
             <div className='modal-footer'>
             </div>
           </div>

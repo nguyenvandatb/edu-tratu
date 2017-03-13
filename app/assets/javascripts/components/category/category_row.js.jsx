@@ -100,6 +100,7 @@ var CategoryRow = React.createClass({
           <td>
             {this.props.description}
           </td>
+          <td>{this.props.dictionary_count}</td>
           <td>
             <a href="#" className='btn btn-info btn-round' onClick={this.editCategory}>
               <i className="fa fa-pencil"></i>
@@ -120,6 +121,7 @@ var CategoryRow = React.createClass({
           <td>
             {this.renderCategoryDescriptionEditFields()}
           </td>
+          <td>{this.props.dictionary_count}</td>
           <td className="col-sm-2">
             <button className='btn btn-success' onClick={this.updateCategory}>Submit</button>
             <button className='btn btn-sm btn-primary' onClick={this.cancelEdit}>

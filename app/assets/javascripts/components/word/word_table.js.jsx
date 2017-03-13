@@ -19,6 +19,9 @@ var WordTable = React.createClass({
     return (rows);
   },
   render: function() {
+    var noWord = (
+      <div className="alert alert-warning">No word</div>
+    );
     return(
       <div className='row'>
         <div className='table-responsive'>
@@ -35,6 +38,8 @@ var WordTable = React.createClass({
               {this.renderWordRows()}
             </tbody>
           </table>
+          {this.props.words == null || this.props.words.length == 0 ?
+            noWord : null}
         </div>
       </div>
     );

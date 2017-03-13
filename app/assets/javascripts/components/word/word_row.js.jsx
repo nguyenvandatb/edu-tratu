@@ -103,7 +103,7 @@ var WordRow = React.createClass({
     if(this.state.edit == false){
       return(
         <tr className="dic_row">
-          <td>{this.props.index + 1}</td>
+          <td>{this.props.index}</td>
           <td>
             {this.props.content}
           </td>

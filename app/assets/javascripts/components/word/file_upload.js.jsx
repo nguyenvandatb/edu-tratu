@@ -16,9 +16,9 @@ var FileUploadInput = React.createClass({
       that.setState({error: true, result: "Upload failed."});
     };
     request.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 204) {
+      if (this.readyState == 4) {
         that.setState({file: false, progress: null});
-        that.props.onFileSuccess();
+        that.props.onFileSuccess(JSON.parse(request.responseText));
       } else if (this.status == 500) {
         that.setState({file: false, progress: null});
         that.props.onFileError();
@@ -30,7 +30,7 @@ var FileUploadInput = React.createClass({
       }
     };
     request.open('POST', this.props.url);
-    request.responseType = 'json';
+    request.responseType = 'text';
     request.send(formData);
     that.setState({ progress: 0 })
   },
@@ -64,6 +64,6 @@ var FileUploadInput = React.createClass({
           <div>Upload file {file.name} ({humanFormat(file.size)}).</div>
       </div>;
     }
-    return <input type="file" onChange={this.onChange} value={this.state.value}/>
+    return <input className="form-control" type="file" onChange={this.onChange} value={this.state.value}/>
   }
 });

@@ -3,10 +3,10 @@ class DictionariesController < ApplicationController
   before_action :load_dictionary, only: [:show, :edit, :update, :destroy]
 
   def index
-    @dictionaries = current_user.dictionaries.order_by("name")
+    @dictionaries = current_user.dictionaries.includes(:words).order_by("name")
     @categories = current_user.categories
-    @dictionaries = @dictionaries.as_json only: [:id, :name, :description],
-      include: {category: {only: [:id, :name]}}
+    @dictionaries = ActiveModelSerializers::SerializableResource.
+      new(@dictionaries, {}).as_json
     @categories = @categories.as_json
     @user_id = current_user.id
   end

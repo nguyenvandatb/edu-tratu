@@ -22,8 +22,13 @@ var DictionariesContainer = React.createClass({
       dataType: 'json',
       type: 'POST',
       data: formData,
-      success: function(dictionaries) {
-        this.setState({dictionaries: dictionaries});
+      success: function(successData) {
+        if (successData['dictionaries'] && successData['categories']) {
+          this.setState({dictionaries: successData['dictionaries']});
+          this.setState({categories: successData['categories']});
+        } else {
+          this.setState({dictionaries: successData});
+        }
         onSuccess();
       }.bind(this),
       error: function(response, status, err) {
@@ -39,7 +44,6 @@ var DictionariesContainer = React.createClass({
       type: 'PATCH',
       data: formData,
       success: function(dictionaries) {
-        console.log(dictionaries);
         this.setState({dictionaries: dictionaries, showNewForm: false});
         onSuccess();
       }.bind(this),

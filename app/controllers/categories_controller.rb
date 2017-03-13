@@ -3,7 +3,8 @@ class CategoriesController < ApplicationController
   before_action :load_category, only: [:update, :destroy]
 
   def index
-    @categories = current_user.categories.as_json
+    @categories = ActiveModelSerializers::SerializableResource.
+      new(current_user.categories.includes(:dictionaries), {}).as_json
   end
 
   def new
@@ -14,7 +15,10 @@ class CategoriesController < ApplicationController
     @category = current_user.categories.build category_params
     if @category.save
       if category_params[:dictionaries_attributes]
-        render json: current_user.dictionaries
+        dictionaries = current_user.dictionaries.as_json only: [:id, :name, :description],
+          include: {category: {only: [:id, :name]}}
+        render json: {dictionaries: dictionaries,
+          categories: current_user.categories}
       else
         render json: current_user.categories
       end

@@ -109,14 +109,15 @@ var DictionaryRow = React.createClass({
         <tr className="dic_row">
           <td>{this.props.index + 1}</td>
           <td>
-            {this.props.category_name}
+            <a href="/categories">{this.props.category_name}</a>
           </td>
           <td>
-            {this.props.name}
+            <a href={"/words?dictionary_id=" + this.state.id}>{this.props.name}</a>
           </td>
           <td className="col-sm-4">
             {this.props.description}
           </td>
+          <td>{this.props.word_count}</td>
           <td>
             <a href="#" className='btn btn-info btn-round' onClick={this.editDictionary}>
               <i className="fa fa-pencil"></i>
@@ -140,6 +141,7 @@ var DictionaryRow = React.createClass({
           <td>
             {this.renderDictionaryDescriptionEditFields()}
           </td>
+          <td>{this.props.word_count}</td>
           <td className="col-sm-2">
             <button className='btn btn-success' onClick={this.updateDictionary}>Submit</button>
             <button className='btn btn-sm btn-primary' onClick={this.cancelEdit}>
